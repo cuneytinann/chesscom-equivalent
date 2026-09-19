@@ -10,10 +10,10 @@ Part of the [Golfstack](https://www.fidelite.art/) project.
 
 ## Play
 
-| file | interface | bytes |
-| --- | --- | --- |
-| `index.html` | clickable board, clock, Chess.com colours | 2,766 |
-| `numerical_packed.html` | square numbers typed into a `prompt()` box, no board | 1,144 |
+| file | interface | bytes | GitHub Pages | project site |
+| --- | --- | --- | --- | --- |
+| `index.html` | clickable board, clock, Chess.com colours | 2,766 | [chesscom-equivalent](https://cuneytinann.github.io/chesscom-equivalent/) | [Chesscom-equivalent.html](https://www.fidelite.art/special/outofLevels/Chesscom-equivalent.html) |
+| `numerical_packed.html` | square numbers typed into a `prompt()` box, no board | 1,144 | [numerical_packed.html](https://cuneytinann.github.io/chesscom-equivalent/numerical_packed.html) | [Chesscom-equivalent_numerical.html](https://www.fidelite.art/special/outofLevels/Chesscom-equivalent_numerical.html) |
 
 On the project site both builds live under `special/outofLevels`, off to the side of the `L1`–`L3` ladder. They are not another rung on it; they follow a different rulebook.
 
@@ -253,10 +253,10 @@ FIDE'nin değil, **Chess.com'un kurallarıyla** oynayan bir satranç hakemi; tek
 
 ## Oyna
 
-| dosya | arayüz | bayt |
-| --- | --- | --- |
-| `index.html` | tıklanabilir tahta, saat, Chess.com renkleri | 2.766 |
-| `numerical_packed.html` | `prompt()` kutusuna yazılan kare numaraları, tahta yok | 1.144 |
+| dosya | arayüz | bayt | GitHub Pages | proje sitesi |
+| --- | --- | --- | --- | --- |
+| `index.html` | tıklanabilir tahta, saat, Chess.com renkleri | 2.766 | [chesscom-equivalent](https://cuneytinann.github.io/chesscom-equivalent/) | [Chesscom-equivalent.html](https://www.fidelite.art/special/outofLevels/Chesscom-equivalent.html) |
+| `numerical_packed.html` | `prompt()` kutusuna yazılan kare numaraları, tahta yok | 1.144 | [numerical_packed.html](https://cuneytinann.github.io/chesscom-equivalent/numerical_packed.html) | [Chesscom-equivalent_numerical.html](https://www.fidelite.art/special/outofLevels/Chesscom-equivalent_numerical.html) |
 
 Proje sitesinde iki yapı da `special/outofLevels` altında, `L1`–`L3` merdiveninin yanında duruyor. Merdivenin bir basamağı değiller; başka bir kural kitabını takip ediyorlar.
 
