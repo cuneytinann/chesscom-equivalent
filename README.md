@@ -21,7 +21,7 @@ Anything from late 2020 onwards will run them: Chrome 85+, Firefox 79+, Safari 1
 
 **On the board.** Click a piece, then click where it should go. Legal squares pick up a dot, a piece you can take picks up a ring, the square you selected, the square you came from and the square you landed on all take the same tint, and a king in check glows red. After every move the board turns around to face whoever is to play. When a pawn reaches the last rank the file it landed on becomes the picker: the four choices stand on the board itself, on a white panel, and you click the one you want — no dialog, no extra row, nothing to dismiss. `½` offers a draw or accepts one; `⚐` resigns, and the two controls are built to match, white on colour. The clock starts at ten minutes and hands back five seconds a move.
 
-**Without the board.** `numerical_packed.html` draws nothing at all. Squares are numbered 1 to 64, a1 through h8, and a move is the two numbers written end to end: e2–e4 is `1329`. To promote, add a fifth digit — `0` bishop, `1` rook, `2` knight, anything else queen. A draw is offered the same way, by hanging a non-digit on the end of the move: `1329x` plays e2–e4 with an offer attached. Type the non-digit on its own and the offer still stands, but you owe a move afterwards. The opponent accepts by answering in kind; a plain move declines it and wipes it off. To resign, leave the box empty or press Cancel.
+**Without the board.** `numerical_packed.html` draws nothing at all. Squares are numbered 0 to 63, a1 through h8 — the engine's own indices — and a move is the two numbers written end to end: e2–e4 is `1228`. To promote, add a fifth digit — `0` bishop, `1` rook, `2` knight, anything else queen. A draw is offered the same way, by hanging a non-digit on the end of the move: `1228x` plays e2–e4 with an offer attached. Type the non-digit on its own and the offer still stands, but you owe a move afterwards. The opponent accepts by answering in kind; a plain move declines it and wipes it off. To resign, leave the box empty or press Cancel.
 
 That is the one place the two builds part company, and it is a difference of gesture rather than of rule. On the board a draw offer is a standing flag you raise with `½` and lower the same way; in the dialog it rides along with a move. Either way the arbiter reads the same two bits, and either way the opponent's plain move turns the offer down. The dialog title carries White's clock, Black's clock and the last move you got past the arbiter, so when an illegal move is quietly refused you will see that the last one never changed. Both clocks start at 900,000 milliseconds — fifteen minutes, no increment — and they keep running while the dialog is open, so thinking costs you what it would over the board. Keeping track of the position is your job.
 
@@ -188,8 +188,9 @@ Both builds were checked by running them, and the rule layer was checked against
 - **Against Chess.com's own endings.** The 89 decisive games from 2020 and 2024 were replayed through both builds' own repetition counters. Both now end all 89 on the ply Chess.com did; the previous builds ended none of them there. On 1,500 games where the conventions agree, old and new both match on all 1,500.
 - **The material test**, twenty-three cases on the board layer, covering both thresholds and every combination that separates them, including the ones no real game produced.
 - **Scripted games on both builds**, in Node against a stubbed `prompt()`: checkmate, the automatic threefold, resignation, an offer carried on a move and accepted, and an en passant capture. These were run on the previous build; the change since touches only when the en passant square is written, and the two checks above cover it.
+- **The switch to 0–63.** When the square numbering moved from 1–64 to 0–63, `numerical_packed.html` was repacked with the settings below and run in lock step against the previous file — the old one fed 1–64, the new one the same squares in 0–63 — over 100 games and 11,544 plies, comparing the full state after every ply: no difference. Scripted checks on invalid input pass as well: `-1`, the same square twice, off-board squares, a pawn sent past the last rank.
 
-The move generator is untouched. The only change inside `M` is when the en passant square is written, and that cannot add or remove a move: a capture needs a neighbouring pawn, which is exactly the condition now checked, and a pinned one is still thrown out by `L`. The legal move lists were compared move by move on the 115,317 random moves above. The perft figures from the FIDE build therefore carry over, though they have not been re-run on this file, and neither has the markup validation nor the cell-by-cell rendering check.
+The move generator is untouched. The only change inside `M` is when the en passant square is written, and that cannot add or remove a move: a capture needs a neighbouring pawn, which is exactly the condition now checked, and a pinned one is still thrown out by `L`. The legal move lists were compared move by move on the 115,317 random moves above. The perft figures from the FIDE build therefore carry over; on `numerical_packed.html` they have been re-run to depth 3 on the five standard positions, all passing, while the markup validation and the cell-by-cell rendering check have not been re-run.
 
 ## Unpacking
 
@@ -212,11 +213,11 @@ Nothing in the loop touches the game, so it is safe to do this in Node. What fal
 | `reassignVars` | `false` |
 | `crushGainFactor` | `1` |
 | `crushLengthFactor` | `0` |
-| `crushCopiesFactor` | `0` |
+| `crushCopiesFactor` | `0.5` |
 | `crushTiebreakerFactor` | `0` |
 | `useES6` | `true` |
 
-Stage 2 wins, the regexp character class: `[\x01-\x1f@-Bj_Z]`, 37 tokens. The bytes land like this:
+Stage 2 wins, the regexp character class: `[\x01-\x1f@-Bj_ZXV]`, 39 tokens. The bytes land like this:
 
 ```
    8 B  <script>
@@ -226,9 +227,9 @@ Stage 2 wins, the regexp character class: `[\x01-\x1f@-Bj_Z]`, 37 tokens. The by
 1175 B
 ```
 
-Turning `reassignVars` on saves six bytes and brings the file down to 1,169. It stays off, for the same reason it stays off in the lichess build: the renamer spends `P` through `V` as dictionary tokens, so the source that comes back out has had its variables shuffled and no longer reads as the program anyone wrote. Four bytes do not buy that back.
+Turning `reassignVars` on saves five bytes and brings the file down to 1,170. It stays off, for the same reason it stays off in the lichess build: the renamer spends `P` through `W` as dictionary tokens, so the source that comes back out has had its variables shuffled and no longer reads as the program anyone wrote. Five bytes do not buy that back.
 
-With the en passant change the ranking flipped. The `1/0/0` that RegPack's README recommends now wins at 1,158; the half-value factors that won before land two bytes behind at 1,160, level with RegPack's own defaults. 315 crusher combinations were tried, and none goes lower. The token set barely moves between them; the difference is which of two near-equal candidates wins the last few substitution rounds.
+The ranking has moved twice. With the en passant change the `1/0/0` that RegPack's README recommends took the lead at 1,158, ahead of the half-value factors that had won before. The switch to 0–63 moved it again: `1/0/0` now lands one byte behind at 1,159, and a small copies weight, `1/0/0.5`, brings the payload back to 1,158 — the same size as before the switch. The half-value factors and RegPack's own defaults sit at 1,160. 216 crusher combinations were tried this time, and none goes lower. The token set barely moves between them; the difference is which of two near-equal candidates wins the last few substitution rounds.
 
 ### The packed file was not built from the shortest source
 
@@ -276,7 +277,7 @@ Proje sitesinde iki yapı da `special` altında, `L1`–`L3` merdiveninin yanın
 
 **Tahtada.** Bir taşa tıkla, sonra gideceği kareye tıkla. Legal kareler nokta alır, alabileceğin taş halka alır, seçtiğin kare, geldiğin kare ve gittiğin kare aynı rengi alır, şahı tehdit altındaki taraf kırmızı parlar. Her hamleden sonra tahta sırası gelene dönüyor. Bir piyon son yatayı bulduğunda indiği sütun seçiciye dönüşür: dört seçenek tahtanın üstünde, beyaz bir panelin içinde durur, istediğine tıklarsın — kutu yok, fazladan satır yok, kapatılacak bir şey yok. `½` beraberlik teklif eder veya kabul eder; `⚐` terk eder, ve iki denetim birbirine benzesin diye kuruldu: renk üstüne beyaz. Saat on dakikadan başlar ve her hamlede beş saniye geri verir.
 
-**Tahtasız.** `numerical_packed.html` hiçbir şey çizmiyor. Kareler a1'den h8'e 1–64 arası numaralı, hamle iki numaranın uç uca yazılmışı: e2–e4 `1329`. Terfi için beşinci bir rakam ekle — `0` fil, `1` kale, `2` at, başka her şey vezir. Beraberlik de aynı yoldan teklif edilir, hamlenin sonuna rakam olmayan bir karakter asarak: `1329x` e2–e4 oynar ve teklifi yanında taşır. Rakam olmayanı tek başına yazarsan teklif yine durur ama sonrasında bir hamle borçlusun. Rakip aynı şekilde cevap vererek kabul eder; düz bir hamle teklifi reddeder ve siler. Terk için kutuyu boş bırak ya da Cancel'a bas.
+**Tahtasız.** `numerical_packed.html` hiçbir şey çizmiyor. Kareler a1'den h8'e 0–63 arası numaralı — motorun kendi indeksleri — hamle iki numaranın uç uca yazılmışı: e2–e4 `1228`. Terfi için beşinci bir rakam ekle — `0` fil, `1` kale, `2` at, başka her şey vezir. Beraberlik de aynı yoldan teklif edilir, hamlenin sonuna rakam olmayan bir karakter asarak: `1228x` e2–e4 oynar ve teklifi yanında taşır. Rakam olmayanı tek başına yazarsan teklif yine durur ama sonrasında bir hamle borçlusun. Rakip aynı şekilde cevap vererek kabul eder; düz bir hamle teklifi reddeder ve siler. Terk için kutuyu boş bırak ya da Cancel'a bas.
 
 İki yapının ayrıldığı tek yer burası, ve bu bir kural farkı değil jest farkı. Tahtada beraberlik teklifi `½` ile kaldırıp aynı şekilde indirdiğin duran bir bayrak; diyalogda hamleyle birlikte yolculuk ediyor. Her iki hâlde de hakem aynı iki biti okuyor, her iki hâlde de rakibin düz hamlesi teklifi reddediyor. Diyalog başlığı Beyaz'ın saatini, Siyah'ın saatini ve hakemden geçirebildiğin son hamleyi taşıyor, yani illegal bir hamle sessizce reddedildiğinde sonuncunun hiç değişmediğini görürsün. İki saat de 900.000 milisaniyeden başlıyor — on beş dakika, artırım yok — ve diyalog açıkken işlemeye devam ediyorlar, yani düşünmek sana tahta başındaki kadara mal oluyor. Pozisyonu takip etmek senin işin.
 
@@ -443,8 +444,9 @@ FIDE ve lichess yapılarının ihtiyaç duyduğu üç fonksiyon burada eksik, ve
 - **Chess.com'un kendi bitişlerine karşı.** 2020 ve 2024'ten kuralları ayıran 89 oyun, iki yapının kendi tekrar sayaçlarıyla yeniden oynatıldı. İkisi de artık 89'unun hepsini Chess.com'un bitirdiği yarım hamlede bitiriyor; önceki yapılar hiçbirini orada bitirmiyordu. Kuralların ayrışmadığı 1.500 oyunda eski ve yeni yapı 1.500'ünde de tutuyor.
 - **Malzeme testi**, tahta katmanında yirmi üç durum; iki eşiği de ve onları ayıran her kombinasyonu kapsıyor, hiçbir gerçek oyunun üretmediği olanlar dahil.
 - **İki yapıda da senaryolu oyunlar**, Node'da sahte bir `prompt()` karşısında: mat, otomatik üçlü tekrar, terk, hamleyle taşınıp kabul edilen bir teklif, ve bir en passant alışı. Bunlar önceki yapıda koşuldu; o zamandan beri değişen tek şey en passant karesinin ne zaman yazıldığı, ve onu yukarıdaki iki kontrol kapsıyor.
+- **0–63'e geçiş.** Kare numaraları 1–64'ten 0–63'e geçerken `numerical_packed.html` aşağıdaki ayarlarla yeniden paketlendi ve önceki dosyayla kilit adımlı koşturuldu — eskisine 1–64, yenisine aynı kareler 0–63 olarak verildi — 100 oyunda 11.544 yarım hamle boyunca her hamleden sonra tam durum karşılaştırıldı: fark yok. Geçersiz girdi senaryoları da geçiyor: `-1`, aynı kareye gidiş, tahta dışı kareler, son yatayın ötesine sürülen piyon.
 
-Hamle üreteci el değmemiş durumda. `M`'nin içindeki tek değişiklik en passant karesinin ne zaman yazıldığı, ve bu bir hamle ekleyip çıkaramaz: alış komşu bir piyon istiyor, artık kontrol edilen koşul tam olarak bu, ve açmazdaki bir piyon yine `L` tarafından eleniyor. Legal hamle listeleri yukarıdaki 115.317 rastgele hamlede tek tek karşılaştırıldı. FIDE yapısının perft rakamları bu yüzden geçerli, ama bu dosya üzerinde yeniden koşulmadılar; işaretleme doğrulaması ve hücre hücre görüntüleme kontrolü de koşulmadı.
+Hamle üreteci el değmemiş durumda. `M`'nin içindeki tek değişiklik en passant karesinin ne zaman yazıldığı, ve bu bir hamle ekleyip çıkaramaz: alış komşu bir piyon istiyor, artık kontrol edilen koşul tam olarak bu, ve açmazdaki bir piyon yine `L` tarafından eleniyor. Legal hamle listeleri yukarıdaki 115.317 rastgele hamlede tek tek karşılaştırıldı. FIDE yapısının perft rakamları bu yüzden geçerli; `numerical_packed.html` üzerinde beş standart pozisyonda 3. derinliğe kadar yeniden koşuldular ve hepsi geçti. İşaretleme doğrulaması ile hücre hücre görüntüleme kontrolü yeniden koşulmadı.
 
 ## Paketi açma
 
@@ -467,11 +469,11 @@ Döngüde oyuna dokunan hiçbir şey yok, o yüzden bunu Node'da yapmak güvenli
 | `reassignVars` | `false` |
 | `crushGainFactor` | `1` |
 | `crushLengthFactor` | `0` |
-| `crushCopiesFactor` | `0` |
+| `crushCopiesFactor` | `0.5` |
 | `crushTiebreakerFactor` | `0` |
 | `useES6` | `true` |
 
-2. aşama kazanıyor, düzenli ifade karakter sınıfı: `[\x01-\x1f@-Bj_Z]`, 37 token. Baytlar şöyle iniyor:
+2. aşama kazanıyor, düzenli ifade karakter sınıfı: `[\x01-\x1f@-Bj_ZXV]`, 39 token. Baytlar şöyle iniyor:
 
 ```
    8 B  <script>
@@ -481,9 +483,9 @@ Döngüde oyuna dokunan hiçbir şey yok, o yüzden bunu Node'da yapmak güvenli
 1175 B
 ```
 
-`reassignVars`'ı açmak altı bayt kazandırıyor ve dosyayı 1.169'a indiriyor. Kapalı kalıyor, lichess yapısında kapalı kaldığı sebeple aynı: yeniden adlandırıcı `P`'den `V`'ye kadarını sözlük token'ı olarak harcıyor, yani geri çıkan kaynağın değişkenleri karıştırılmış oluyor ve artık kimsenin yazdığı program gibi okunmuyor. Dört bayt bunu geri satın almıyor.
+`reassignVars`'ı açmak beş bayt kazandırıyor ve dosyayı 1.170'e indiriyor. Kapalı kalıyor, lichess yapısında kapalı kaldığı sebeple aynı: yeniden adlandırıcı `P`'den `W`'ye kadarını sözlük token'ı olarak harcıyor, yani geri çıkan kaynağın değişkenleri karıştırılmış oluyor ve artık kimsenin yazdığı program gibi okunmuyor. Beş bayt bunu geri satın almıyor.
 
-En passant değişikliğiyle sıralama tersine döndü. RegPack'in README'sinin önerdiği `1/0/0` artık 1.158'le kazanıyor; önceden kazanan yarım değerli faktörler iki bayt geride, 1.160'ta, RegPack'in kendi varsayılanlarıyla aynı yerde kalıyor. 315 crusher kombinasyonu denendi, hiçbiri daha aşağı inmiyor. Token kümesi aralarında neredeyse hiç kıpırdamıyor; fark, son birkaç ikame turunu birbirine çok yakın iki adaydan hangisinin kazandığı.
+Sıralama iki kez değişti. En passant değişikliğiyle RegPack'in README'sinin önerdiği `1/0/0`, önceden kazanan yarım değerli faktörlerin önüne geçip 1.158'le başa oturdu. 0–63'e geçiş onu yine yerinden etti: `1/0/0` artık bir bayt geride, 1.159'da; küçük bir kopya ağırlığı, `1/0/0.5`, yükü 1.158'e, geçişten önceki boyuta geri getiriyor. Yarım değerli faktörler ve RegPack'in kendi varsayılanları 1.160'ta. Bu sefer 216 crusher kombinasyonu denendi, hiçbiri daha aşağı inmiyor. Token kümesi aralarında neredeyse hiç kıpırdamıyor; fark, son birkaç ikame turunu birbirine çok yakın iki adaydan hangisinin kazandığı.
 
 ### Paketli dosya en kısa kaynaktan kurulmadı
 
