@@ -2,7 +2,7 @@
 
 # chesscom-equivalent
 
-A chess arbiter that plays by **Chess.com's rules** rather than FIDE's, in a single HTML file of **2,878 bytes** — and the same arbiter stripped of its board, in **1,175**. Two players, one screen. No libraries, no build step, no server. Download a file, double-click, play.
+A chess arbiter that plays by **Chess.com's rules** rather than FIDE's, in a single HTML file of **2,852 bytes** — and the same arbiter stripped of its board, in **1,175**. Two players, one screen. No libraries, no build step, no server. Download a file, double-click, play.
 
 The two rulebooks are close, but they are not the same book, and every place they part ways is written down below.
 
@@ -12,14 +12,14 @@ Part of the [Golfstack](https://www.fidelite.art/) project.
 
 | file | interface | bytes | GitHub Pages | project site |
 | --- | --- | --- | --- | --- |
-| `index.html` | clickable board, clock, Chess.com colours | 2,878 | [chesscom-equivalent](https://cuneytinann.github.io/chesscom-equivalent/) | [Chesscom-equivalent.html](https://www.fidelite.art/special/Chesscom-equivalent.html) |
+| `index.html` | clickable board, clock, Chess.com colours | 2,852 | [chesscom-equivalent](https://cuneytinann.github.io/chesscom-equivalent/) | [Chesscom-equivalent.html](https://www.fidelite.art/special/Chesscom-equivalent.html) |
 | `numerical_packed.html` | square numbers typed into a `prompt()` box, no board | 1,175 | [numerical_packed.html](https://cuneytinann.github.io/chesscom-equivalent/numerical_packed.html) | [Chesscom-equivalent_numerical.html](https://www.fidelite.art/special/Chesscom-equivalent_numerical.html) |
 
 On the project site both builds live under `special`, off to the side of the `L1`–`L3` ladder. They are not another rung on it; they follow a different rulebook.
 
 Anything from late 2020 onwards will run them: Chrome 85+, Firefox 79+, Safari 14+. Three things set that floor — BigInt, which the starting position is written with; the `safe` keyword in `place-content`, which keeps the board reachable on a narrow screen; and the `||=` operator, which the packed build uses.
 
-**On the board.** Click a piece, then click where it should go. Legal squares pick up a dot, a piece you can take picks up a ring, the square you selected, the square you came from and the square you landed on all take the same tint, and a king in check glows red. After every move the board turns around to face whoever is to play. When a pawn reaches the last rank the file it landed on becomes the picker: the four choices stand on the board itself, on a white panel, and you click the one you want — no dialog, no extra row, nothing to dismiss. `½` offers a draw or accepts one; `⚐` resigns, and the two controls are built to match, white on colour. The clock starts at ten minutes and hands back five seconds a move.
+**On the board.** Click a piece, then click where it should go. Legal squares pick up a dot, a piece you can take picks up a ring, the square you selected, the square you came from and the square you landed on all take the same tint, and the square of a king in check turns red. After every move the board turns around to face whoever is to play. When a pawn reaches the last rank the file it landed on becomes the picker: the four choices stand on the board itself, on a white panel, and you click the one you want — no dialog, no extra row, nothing to dismiss. `½` offers a draw or accepts one; `⚐` resigns, and the two controls are built to match, white on colour. The clock starts at ten minutes and hands back five seconds a move.
 
 **Without the board.** `numerical_packed.html` draws nothing at all. Squares are numbered 0 to 63, a1 through h8 — the engine's own indices — and a move is the two numbers written end to end: e2–e4 is `1228`. To promote, add a fifth digit — `0` bishop, `1` rook, `2` knight, anything else queen. A draw is offered the same way, by hanging a non-digit on the end of the move: `1228x` plays e2–e4 with an offer attached. Type the non-digit on its own and the offer still stands, but you owe a move afterwards. The opponent accepts by answering in kind; a plain move declines it and wipes it off. To resign, leave the box empty or press Cancel.
 
@@ -29,7 +29,7 @@ That is the one place the two builds part company, and it is a difference of ges
 
 These are not a full version and a cut-down one. Same game, same rules, same core — and **1,175 bytes is what that core really costs.** Everything on top of it exists for you, not for chess.
 
-The 1,703 bytes `index.html` spends beyond the packed file buy a board you can see, pieces you can click, a clock that ticks, a promotion picker drawn onto the board, colours that tell you which squares you may use, and a status line. The arbiter underneath is the same arbiter.
+The 1,677 bytes `index.html` spends beyond the packed file buy a board you can see, pieces you can click, a clock that ticks, a promotion picker drawn onto the board, colours that tell you which squares you may use, and a status line. The arbiter underneath is the same arbiter.
 
 ## Why Chess.com and not FIDE
 
@@ -136,7 +136,7 @@ Sampled from screenshots of a live game rather than taken from a stylesheet, the
 | page behind the board | `#302E2B` | |
 | highlight | `#FFFF33` at 50% | `#F5F681` on light, `#B9CA42` on dark |
 | legal move | black at 13% | a dot at 22% of the square, a ring from 49% to 61% for a capture |
-| king in check | red, fading out | |
+| king in check | `#E004`, red at 27% laid over the square | `#ECAD99` on light, `#946D3C` on dark |
 
 Two of these are shorter than what they replace. Chess.com paints the square you selected and the two squares of the last move in **the same** yellow, where lichess uses two different greens — one ternary instead of two. And the move dot is a flat black tint, where lichess tints it green with its own alpha. The ring costs more: lichess fills the corners of the square, Chess.com draws a true annulus, which needs two more colour stops.
 
@@ -168,12 +168,12 @@ Every byte of `index.html`, by part.
 | `Z` | 96 | the verdict |
 | `j` | 88 | the clock, and the flag-fall material test |
 | setup | 71 | the 64 cells, generated at load |
-| `d` | 743 | draw the board, and the promotion picker on it |
+| `d` | 717 | draw the board, and the promotion picker on it |
 | `A`, `Bt`, `S` | 301 | play the move, the buttons, the click |
 | first draw and interval | 31 | |
-| **total** | **2,878** | |
+| **total** | **2,852** | |
 
-Sliced the other way: the rules come to **1,010** bytes and the page that shows them to **1,868**. The referee is cheap and the stage is expensive, which is exactly the argument the packed file makes.
+Sliced the other way: the rules come to **1,010** bytes and the page that shows them to **1,842**. The referee is cheap and the stage is expensive, which is exactly the argument the packed file makes.
 
 Three functions that the FIDE and lichess builds need are missing here, and none of them was shortened — they were deleted. `H`, the flag-fall material test, collapsed into a second reading of `I`'s own counters. `F`, which turned a resignation or a flag fall into a result, had nothing left to decide once resignation became an unconditional loss. `D`, the draw offer, kept only its offer-and-accept half; the claim half went with the claims.
 
@@ -258,7 +258,7 @@ MIT
 
 # chesscom-equivalent (Türkçe)
 
-FIDE'nin değil, **Chess.com'un kurallarıyla** oynayan bir satranç hakemi; tek bir HTML dosyasında **2.878 bayt** — ve aynı hakemin tahtasından soyulmuş hâli, **1.175** baytta. İki oyuncu, tek ekran. Kütüphane yok, derleme adımı yok, sunucu yok. Dosyayı indir, çift tıkla, oyna.
+FIDE'nin değil, **Chess.com'un kurallarıyla** oynayan bir satranç hakemi; tek bir HTML dosyasında **2.852 bayt** — ve aynı hakemin tahtasından soyulmuş hâli, **1.175** baytta. İki oyuncu, tek ekran. Kütüphane yok, derleme adımı yok, sunucu yok. Dosyayı indir, çift tıkla, oyna.
 
 İki kural kitabı birbirine yakın ama aynı kitap değil, ve ayrıldıkları her yer aşağıda yazılı.
 
@@ -268,14 +268,14 @@ FIDE'nin değil, **Chess.com'un kurallarıyla** oynayan bir satranç hakemi; tek
 
 | dosya | arayüz | bayt | GitHub Pages | proje sitesi |
 | --- | --- | --- | --- | --- |
-| `index.html` | tıklanabilir tahta, saat, Chess.com renkleri | 2.878 | [chesscom-equivalent](https://cuneytinann.github.io/chesscom-equivalent/) | [Chesscom-equivalent.html](https://www.fidelite.art/special/Chesscom-equivalent.html) |
+| `index.html` | tıklanabilir tahta, saat, Chess.com renkleri | 2.852 | [chesscom-equivalent](https://cuneytinann.github.io/chesscom-equivalent/) | [Chesscom-equivalent.html](https://www.fidelite.art/special/Chesscom-equivalent.html) |
 | `numerical_packed.html` | `prompt()` kutusuna yazılan kare numaraları, tahta yok | 1.175 | [numerical_packed.html](https://cuneytinann.github.io/chesscom-equivalent/numerical_packed.html) | [Chesscom-equivalent_numerical.html](https://www.fidelite.art/special/Chesscom-equivalent_numerical.html) |
 
 Proje sitesinde iki yapı da `special` altında, `L1`–`L3` merdiveninin yanında duruyor. Merdivenin bir basamağı değiller; başka bir kural kitabını takip ediyorlar.
 
 2020 sonundan itibaren her şey çalıştırır: Chrome 85+, Firefox 79+, Safari 14+. Bu tabanı üç şey belirliyor — başlangıç pozisyonunun yazıldığı BigInt; dar ekranda tahtayı erişilebilir tutan `place-content` içindeki `safe` anahtar sözcüğü; ve paketli yapının kullandığı `||=` operatörü.
 
-**Tahtada.** Bir taşa tıkla, sonra gideceği kareye tıkla. Legal kareler nokta alır, alabileceğin taş halka alır, seçtiğin kare, geldiğin kare ve gittiğin kare aynı rengi alır, şahı tehdit altındaki taraf kırmızı parlar. Her hamleden sonra tahta sırası gelene dönüyor. Bir piyon son yatayı bulduğunda indiği sütun seçiciye dönüşür: dört seçenek tahtanın üstünde, beyaz bir panelin içinde durur, istediğine tıklarsın — kutu yok, fazladan satır yok, kapatılacak bir şey yok. `½` beraberlik teklif eder veya kabul eder; `⚐` terk eder, ve iki denetim birbirine benzesin diye kuruldu: renk üstüne beyaz. Saat on dakikadan başlar ve her hamlede beş saniye geri verir.
+**Tahtada.** Bir taşa tıkla, sonra gideceği kareye tıkla. Legal kareler nokta alır, alabileceğin taş halka alır, seçtiğin kare, geldiğin kare ve gittiğin kare aynı rengi alır, şahı tehdit altındaki tarafın şah karesi kırmızıya boyanır. Her hamleden sonra tahta sırası gelene dönüyor. Bir piyon son yatayı bulduğunda indiği sütun seçiciye dönüşür: dört seçenek tahtanın üstünde, beyaz bir panelin içinde durur, istediğine tıklarsın — kutu yok, fazladan satır yok, kapatılacak bir şey yok. `½` beraberlik teklif eder veya kabul eder; `⚐` terk eder, ve iki denetim birbirine benzesin diye kuruldu: renk üstüne beyaz. Saat on dakikadan başlar ve her hamlede beş saniye geri verir.
 
 **Tahtasız.** `numerical_packed.html` hiçbir şey çizmiyor. Kareler a1'den h8'e 0–63 arası numaralı — motorun kendi indeksleri — hamle iki numaranın uç uca yazılmışı: e2–e4 `1228`. Terfi için beşinci bir rakam ekle — `0` fil, `1` kale, `2` at, başka her şey vezir. Beraberlik de aynı yoldan teklif edilir, hamlenin sonuna rakam olmayan bir karakter asarak: `1228x` e2–e4 oynar ve teklifi yanında taşır. Rakam olmayanı tek başına yazarsan teklif yine durur ama sonrasında bir hamle borçlusun. Rakip aynı şekilde cevap vererek kabul eder; düz bir hamle teklifi reddeder ve siler. Terk için kutuyu boş bırak ya da Cancel'a bas.
 
@@ -285,7 +285,7 @@ Proje sitesinde iki yapı da `special` altında, `L1`–`L3` merdiveninin yanın
 
 Bunlar tam sürüm ve kırpılmış sürüm değil. Aynı oyun, aynı kurallar, aynı çekirdek — ve **o çekirdeğin gerçek maliyeti 1.175 bayt.** Üstündeki her şey satranç için değil, senin için var.
 
-`index.html`'in paketli dosyanın ötesinde harcadığı 1.703 bayt şunları satın alıyor: görebildiğin bir tahta, tıklayabildiğin taşlar, işleyen bir saat, tahtanın üstüne çizilen bir terfi seçici, hangi kareleri kullanabileceğini söyleyen renkler ve bir durum satırı. Altındaki hakem aynı hakem.
+`index.html`'in paketli dosyanın ötesinde harcadığı 1.677 bayt şunları satın alıyor: görebildiğin bir tahta, tıklayabildiğin taşlar, işleyen bir saat, tahtanın üstüne çizilen bir terfi seçici, hangi kareleri kullanabileceğini söyleyen renkler ve bir durum satırı. Altındaki hakem aynı hakem.
 
 ## Neden Chess.com, neden FIDE değil
 
@@ -392,7 +392,7 @@ Bir stil dosyasından alınmadı, canlı bir oyunun ekran görüntülerinden ör
 | tahtanın arkasındaki sayfa | `#302E2B` | |
 | vurgu | `#FFFF33`, %50 | açıkta `#F5F681`, koyuda `#B9CA42` |
 | legal hamle | siyah, %13 | karenin %22'sinde nokta, alışta %49'dan %61'e halka |
-| şahı tehdit altında | kırmızı, dışa doğru sönen | |
+| şahı tehdit altında | `#E004`, karenin üstüne %27 kırmızı | açıkta `#ECAD99`, koyuda `#946D3C` |
 
 Bunların ikisi, yerini aldıkları şeyden kısa. Chess.com seçtiğin kareyi ve son hamlenin iki karesini **aynı** sarıyla boyuyor, oysa lichess iki farklı yeşil kullanıyor — iki ternary yerine bir tane. Hamle noktası da düz bir siyah tonlama, lichess onu kendi alfasıyla yeşile boyuyor. Halka ise pahalıya geliyor: lichess karenin köşelerini dolduruyor, Chess.com gerçek bir halka çiziyor, bu da iki renk durağı daha istiyor.
 
@@ -424,12 +424,12 @@ Alfa `#FFFF3380` yerine dört haneli `#FF38` olarak yazıldı. Bu alfayı 0,5 ye
 | `Z` | 96 | hüküm |
 | `j` | 88 | saat, ve bayrak düşmesinin malzeme testi |
 | kurulum | 71 | 64 hücre, yüklenirken üretiliyor |
-| `d` | 743 | tahtayı ve üstündeki terfi seçicisini çiz |
+| `d` | 717 | tahtayı ve üstündeki terfi seçicisini çiz |
 | `A`, `Bt`, `S` | 301 | hamleyi oyna, düğmeler, tıklama |
 | ilk çizim ve interval | 31 | |
-| **toplam** | **2.878** | |
+| **toplam** | **2.852** | |
 
-Diğer yönden dilimlenince: kurallar **1.010** bayta, onları gösteren sayfa **1.868** bayta çıkıyor. Hakem ucuz, sahne pahalı — paketli dosyanın öne sürdüğü argüman da tam olarak bu.
+Diğer yönden dilimlenince: kurallar **1.010** bayta, onları gösteren sayfa **1.842** bayta çıkıyor. Hakem ucuz, sahne pahalı — paketli dosyanın öne sürdüğü argüman da tam olarak bu.
 
 FIDE ve lichess yapılarının ihtiyaç duyduğu üç fonksiyon burada eksik, ve hiçbiri kısaltılmadı — silindiler. Bayrak düşmesinin malzeme testi `H`, `I`'nin kendi sayaçlarının ikinci kez okunmasına çöktü. Terk veya bayrak düşmesini sonuca çeviren `F`, terk koşulsuz kayıp hâline gelince karar verecek bir şey bulamadı. Beraberlik teklifi `D`, yalnızca teklif-ve-kabul yarısını korudu; iddia yarısı iddialarla birlikte gitti.
 
