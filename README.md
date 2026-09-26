@@ -2,7 +2,7 @@
 
 # chesscom-equivalent
 
-A chess arbiter that plays by **Chess.com's rules** rather than FIDE's, in a single HTML file of **2,852 bytes** — and the same arbiter stripped of its board, in **1,175**. Two players, one screen. No libraries, no build step, no server. Download a file, double-click, play.
+A chess arbiter that plays by **Chess.com's rules** rather than FIDE's, in a single HTML file of **2,837 bytes** — and the same arbiter stripped of its board, in **1,161**. Two players, one screen. No libraries, no build step, no server. Download a file, double-click, play.
 
 The two rulebooks are close, but they are not the same book, and every place they part ways is written down below.
 
@@ -12,8 +12,8 @@ Part of the [Golfstack](https://www.fidelite.art/) project.
 
 | file | interface | bytes | GitHub Pages | project site |
 | --- | --- | --- | --- | --- |
-| `index.html` | clickable board, clock, Chess.com colours | 2,852 | [chesscom-equivalent](https://cuneytinann.github.io/chesscom-equivalent/) | [Chesscom-equivalent.html](https://www.fidelite.art/special/Chesscom-equivalent.html) |
-| `numerical_packed.html` | square numbers typed into a `prompt()` box, no board | 1,175 | [numerical_packed.html](https://cuneytinann.github.io/chesscom-equivalent/numerical_packed.html) | [Chesscom-equivalent_numerical.html](https://www.fidelite.art/special/Chesscom-equivalent_numerical.html) |
+| `index.html` | clickable board, clock, Chess.com colours | 2,837 | [chesscom-equivalent](https://cuneytinann.github.io/chesscom-equivalent/) | [Chesscom-equivalent.html](https://www.fidelite.art/special/Chesscom-equivalent.html) |
+| `numerical_packed.html` | square numbers typed into a `prompt()` box, no board | 1,161 | [numerical_packed.html](https://cuneytinann.github.io/chesscom-equivalent/numerical_packed.html) | [Chesscom-equivalent_numerical.html](https://www.fidelite.art/special/Chesscom-equivalent_numerical.html) |
 
 On the project site both builds live under `special`, off to the side of the `L1`–`L3` ladder. They are not another rung on it; they follow a different rulebook.
 
@@ -27,9 +27,9 @@ That is the one place the two builds part company, and it is a difference of ges
 
 ## Two files, one arbiter
 
-These are not a full version and a cut-down one. Same game, same rules, same core — and **1,175 bytes is what that core really costs.** Everything on top of it exists for you, not for chess.
+These are not a full version and a cut-down one. Same game, same rules, same core — and **1,161 bytes is what that core really costs.** Everything on top of it exists for you, not for chess.
 
-The 1,677 bytes `index.html` spends beyond the packed file buy a board you can see, pieces you can click, a clock that ticks, a promotion picker drawn onto the board, colours that tell you which squares you may use, and a status line. The arbiter underneath is the same arbiter.
+The 1,676 bytes `index.html` spends beyond the packed file buy a board you can see, pieces you can click, a clock that ticks, a promotion picker drawn onto the board, colours that tell you which squares you may use, and a status line. The arbiter underneath is the same arbiter.
 
 ## Why Chess.com and not FIDE
 
@@ -159,21 +159,21 @@ Every byte of `index.html`, by part.
 | markup and CSS | 596 | board, panel, controls, colours, layout |
 | `<script>` tags | 17 | |
 | state and aliases | 181 | board, clock, castling rights, repetition table |
-| `G` | 264 | can this piece reach that square |
+| `G` | 250 | can this piece reach that square |
 | `V` | 51 | is this square attacked |
 | `L` | 101 | is this move legal — play it, ask, take it back |
 | `C` | 28 | which castling right a square forfeits |
 | `M` | 213 | counter, promotion, en passant victim, rook hop, en passant square and whether a neighbouring pawn could take it |
-| `I` | 97 | material, and whether mate can be forced |
+| `I` | 96 | material, and whether mate can be forced |
 | `Z` | 96 | the verdict |
 | `j` | 88 | the clock, and the flag-fall material test |
 | setup | 71 | the 64 cells, generated at load |
 | `d` | 717 | draw the board, and the promotion picker on it |
 | `A`, `Bt`, `S` | 301 | play the move, the buttons, the click |
 | first draw and interval | 31 | |
-| **total** | **2,852** | |
+| **total** | **2,837** | |
 
-Sliced the other way: the rules come to **1,010** bytes and the page that shows them to **1,842**. The referee is cheap and the stage is expensive, which is exactly the argument the packed file makes.
+Sliced the other way: the rules come to **995** bytes and the page that shows them to **1,842**. The referee is cheap and the stage is expensive, which is exactly the argument the packed file makes.
 
 Three functions that the FIDE and lichess builds need are missing here, and none of them was shortened — they were deleted. `H`, the flag-fall material test, collapsed into a second reading of `I`'s own counters. `F`, which turned a resignation or a flag fall into a result, had nothing left to decide once resignation became an unconditional loss. `D`, the draw offer, kept only its offer-and-accept half; the claim half went with the claims.
 
@@ -189,6 +189,7 @@ Both builds were checked by running them, and the rule layer was checked against
 - **The material test**, twenty-three cases on the board layer, covering both thresholds and every combination that separates them, including the ones no real game produced.
 - **Scripted games on both builds**, in Node against a stubbed `prompt()`: checkmate, the automatic threefold, resignation, an offer carried on a move and accepted, and an en passant capture. These were run on the previous build; the change since touches only when the en passant square is written, and the two checks above cover it.
 - **The switch to 0–63.** When the square numbering moved from 1–64 to 0–63, `numerical_packed.html` was repacked with the settings below and run in lock step against the previous file — the old one fed 1–64, the new one the same squares in 0–63 — over 100 games and 11,544 plies, comparing the full state after every ply: no difference. Scripted checks on invalid input pass as well: `-1`, the same square twice, off-board squares, a pawn sent past the last rank.
+- **The rule optimizations of September 2026.** Both builds took over the rule-side optimizations made in [FideLite](https://github.com/cuneytinann/FideLite): the pawn's double step and castling both walk through `S()`, the castling rook's square is computed from the king's target, the start-rank test is shorter, `I` reads the square colour more cheaply, and the packed build closes the en passant square with `Y` instead of `-1`. None of them changes a single verdict, and the pseudo-legal en passant square is untouched. `index.html` was run side by side with its previous version on random games — legal move lists, the en passant square and `I` after every ply, plus a castling stress test — with no difference, and CPW perft to depth 3 passes. `numerical_packed.html` was rebuilt from its own source with the same changes carried over and run in lock step against the previous file over 120 games and 32,621 steps, comparing the full state after every step: no difference. Mate for either side, stalemate, the automatic fifty-move draw, insufficient material, resignation, flag fall and `TM` were all reached along the way. The markup did not change.
 
 The move generator is untouched. The only change inside `M` is when the en passant square is written, and that cannot add or remove a move: a capture needs a neighbouring pawn, which is exactly the condition now checked, and a pinned one is still thrown out by `L`. The legal move lists were compared move by move on the 115,317 random moves above. The perft figures from the FIDE build therefore carry over; on `numerical_packed.html` they have been re-run to depth 3 on the five standard positions, all passing, while the markup validation and the cell-by-cell rendering check have not been re-run.
 
@@ -200,40 +201,42 @@ The move generator is untouched. The only change inside `M` is when the en passa
 eval(_)   →   console.log(_)
 ```
 
-Nothing in the loop touches the game, so it is safe to do this in Node. What falls out is 1,334 bytes of source.
+Nothing in the loop touches the game, so it is safe to do this in Node. What falls out is 1,320 bytes of source.
 
 **Download the file rather than copying it out of the browser.** The dictionary keys are control characters from the `\x01`–`\x1f` range, and the clipboard — or any editor that tidies up line endings — will quietly destroy them.
 
 ## Packing
 
-[RegPack 5.0.1](https://github.com/Siorki/RegPack). These settings rebuild `numerical_packed.html` from that source **byte for byte**:
+[RegPack 5.0.4](https://github.com/Siorki/RegPack); 5.0.1 produces the identical file. These settings rebuild `numerical_packed.html` from that source **byte for byte**:
 
 | option | value |
 | --- | --- |
 | `reassignVars` | `false` |
-| `crushGainFactor` | `1` |
+| `crushGainFactor` | `0` |
 | `crushLengthFactor` | `0` |
-| `crushCopiesFactor` | `0.5` |
+| `crushCopiesFactor` | `0` |
 | `crushTiebreakerFactor` | `0` |
 | `useES6` | `true` |
 
-Stage 2 wins, the regexp character class: `[\x01-\x1f@-Bj_ZXV]`, 39 tokens. The bytes land like this:
+Stage 2 wins, the regexp character class: `[\x01-\x1f@-Bj_Z]`, 37 tokens, 35 substitution rounds. The bytes land like this:
 
 ```
    8 B  <script>
-1158 B  packed payload
+1144 B  packed payload
    9 B  </script>
 ----
-1175 B
+1161 B
 ```
 
-Turning `reassignVars` on saves five bytes and brings the file down to 1,170. It stays off, for the same reason it stays off in the lichess build: the renamer spends `P` through `W` as dictionary tokens, so the source that comes back out has had its variables shuffled and no longer reads as the program anyone wrote. Five bytes do not buy that back.
+Turning `reassignVars` on saves three bytes and brings the file down to 1,158. It stays off, for the same reason it stays off in the lichess build: the renamer spends `P` through `U` as dictionary tokens, so the source that comes back out has had its variables shuffled and no longer reads as the program anyone wrote. Three bytes do not buy that back.
 
 The ranking has moved twice. With the en passant change the `1/0/0` that RegPack's README recommends took the lead at 1,158, ahead of the half-value factors that had won before. The switch to 0–63 moved it again: `1/0/0` now lands one byte behind at 1,159, and a small copies weight, `1/0/0.5`, brings the payload back to 1,158 — the same size as before the switch. The half-value factors and RegPack's own defaults sit at 1,160. 216 crusher combinations were tried this time, and none goes lower. The token set barely moves between them; the difference is which of two near-equal candidates wins the last few substitution rounds.
 
+The rule optimizations of September 2026 moved it a third time. With them carried over, all four factors at zero win at 1,144; 350 combinations were tried — gain 0 to 3, length 0 to 2, copies 0 to 2 in steps of a half, tiebreaker 0 or 1 — and the worst lands at 1,181. Packed one at a time, the pawn walk saves 6 bytes, castling 4 and closing the en passant square with `Y` one, while the square colour costs a byte on its own and saves one in company; together they take the payload from 1,158 to 1,144. The one change left out is sharing `T|b[f]` in `G`, which saves a byte in plain form and costs three once packed.
+
 ### The packed file was not built from the shortest source
 
-The source above runs to 1,334 bytes, and it is the lichess source with the rules swapped, not a fresh one. The same trade-offs apply: aliases and shared functions win in plain form and lose under the packer, because RegPack is paid in repeated substrings and an alias is precisely the thing that takes repetition away. The verdict expression is written out twice on purpose rather than being given a name, because the crusher turns the second copy into a single token and charges less for it than a function would cost.
+The source above runs to 1,320 bytes, and it is the lichess source with the rules swapped, not a fresh one. The same trade-offs apply: aliases and shared functions win in plain form and lose under the packer, because RegPack is paid in repeated substrings and an alias is precisely the thing that takes repetition away. The verdict expression is written out twice on purpose rather than being given a name, because the crusher turns the second copy into a single token and charges less for it than a function would cost.
 
 One of those duplicates went away with the claims, though — the draw channel used to re-evaluate the verdict, and now it does not. That is a rule change, not a packing decision, and it is the reason the plain source dropped 181 bytes while the packed file dropped only 84. The en passant change ran the other way, and with the same asymmetry: 41 bytes into the plain source, 31 into the pack.
 
@@ -258,7 +261,7 @@ MIT
 
 # chesscom-equivalent (Türkçe)
 
-FIDE'nin değil, **Chess.com'un kurallarıyla** oynayan bir satranç hakemi; tek bir HTML dosyasında **2.852 bayt** — ve aynı hakemin tahtasından soyulmuş hâli, **1.175** baytta. İki oyuncu, tek ekran. Kütüphane yok, derleme adımı yok, sunucu yok. Dosyayı indir, çift tıkla, oyna.
+FIDE'nin değil, **Chess.com'un kurallarıyla** oynayan bir satranç hakemi; tek bir HTML dosyasında **2.837 bayt** — ve aynı hakemin tahtasından soyulmuş hâli, **1.161** baytta. İki oyuncu, tek ekran. Kütüphane yok, derleme adımı yok, sunucu yok. Dosyayı indir, çift tıkla, oyna.
 
 İki kural kitabı birbirine yakın ama aynı kitap değil, ve ayrıldıkları her yer aşağıda yazılı.
 
@@ -268,8 +271,8 @@ FIDE'nin değil, **Chess.com'un kurallarıyla** oynayan bir satranç hakemi; tek
 
 | dosya | arayüz | bayt | GitHub Pages | proje sitesi |
 | --- | --- | --- | --- | --- |
-| `index.html` | tıklanabilir tahta, saat, Chess.com renkleri | 2.852 | [chesscom-equivalent](https://cuneytinann.github.io/chesscom-equivalent/) | [Chesscom-equivalent.html](https://www.fidelite.art/special/Chesscom-equivalent.html) |
-| `numerical_packed.html` | `prompt()` kutusuna yazılan kare numaraları, tahta yok | 1.175 | [numerical_packed.html](https://cuneytinann.github.io/chesscom-equivalent/numerical_packed.html) | [Chesscom-equivalent_numerical.html](https://www.fidelite.art/special/Chesscom-equivalent_numerical.html) |
+| `index.html` | tıklanabilir tahta, saat, Chess.com renkleri | 2.837 | [chesscom-equivalent](https://cuneytinann.github.io/chesscom-equivalent/) | [Chesscom-equivalent.html](https://www.fidelite.art/special/Chesscom-equivalent.html) |
+| `numerical_packed.html` | `prompt()` kutusuna yazılan kare numaraları, tahta yok | 1.161 | [numerical_packed.html](https://cuneytinann.github.io/chesscom-equivalent/numerical_packed.html) | [Chesscom-equivalent_numerical.html](https://www.fidelite.art/special/Chesscom-equivalent_numerical.html) |
 
 Proje sitesinde iki yapı da `special` altında, `L1`–`L3` merdiveninin yanında duruyor. Merdivenin bir basamağı değiller; başka bir kural kitabını takip ediyorlar.
 
@@ -283,9 +286,9 @@ Proje sitesinde iki yapı da `special` altında, `L1`–`L3` merdiveninin yanın
 
 ## İki dosya, tek hakem
 
-Bunlar tam sürüm ve kırpılmış sürüm değil. Aynı oyun, aynı kurallar, aynı çekirdek — ve **o çekirdeğin gerçek maliyeti 1.175 bayt.** Üstündeki her şey satranç için değil, senin için var.
+Bunlar tam sürüm ve kırpılmış sürüm değil. Aynı oyun, aynı kurallar, aynı çekirdek — ve **o çekirdeğin gerçek maliyeti 1.161 bayt.** Üstündeki her şey satranç için değil, senin için var.
 
-`index.html`'in paketli dosyanın ötesinde harcadığı 1.677 bayt şunları satın alıyor: görebildiğin bir tahta, tıklayabildiğin taşlar, işleyen bir saat, tahtanın üstüne çizilen bir terfi seçici, hangi kareleri kullanabileceğini söyleyen renkler ve bir durum satırı. Altındaki hakem aynı hakem.
+`index.html`'in paketli dosyanın ötesinde harcadığı 1.676 bayt şunları satın alıyor: görebildiğin bir tahta, tıklayabildiğin taşlar, işleyen bir saat, tahtanın üstüne çizilen bir terfi seçici, hangi kareleri kullanabileceğini söyleyen renkler ve bir durum satırı. Altındaki hakem aynı hakem.
 
 ## Neden Chess.com, neden FIDE değil
 
@@ -415,21 +418,21 @@ Alfa `#FFFF3380` yerine dört haneli `#FF38` olarak yazıldı. Bu alfayı 0,5 ye
 | işaretleme ve CSS | 596 | tahta, panel, denetimler, renkler, yerleşim |
 | `<script>` etiketleri | 17 | |
 | durum ve takma adlar | 181 | tahta, saat, rok hakları, tekrar tablosu |
-| `G` | 264 | bu taş o kareye ulaşabilir mi |
+| `G` | 250 | bu taş o kareye ulaşabilir mi |
 | `V` | 51 | bu kare tehdit altında mı |
 | `L` | 101 | bu hamle legal mi — oyna, sor, geri al |
 | `C` | 28 | bir karenin hangi rok hakkını düşürdüğü |
 | `M` | 213 | sayaç, terfi, en passant kurbanı, kale sıçraması, en passant karesi ve komşu bir piyonun onu alıp alamayacağı |
-| `I` | 97 | malzeme, ve matın zorlanabilir olup olmadığı |
+| `I` | 96 | malzeme, ve matın zorlanabilir olup olmadığı |
 | `Z` | 96 | hüküm |
 | `j` | 88 | saat, ve bayrak düşmesinin malzeme testi |
 | kurulum | 71 | 64 hücre, yüklenirken üretiliyor |
 | `d` | 717 | tahtayı ve üstündeki terfi seçicisini çiz |
 | `A`, `Bt`, `S` | 301 | hamleyi oyna, düğmeler, tıklama |
 | ilk çizim ve interval | 31 | |
-| **toplam** | **2.852** | |
+| **toplam** | **2.837** | |
 
-Diğer yönden dilimlenince: kurallar **1.010** bayta, onları gösteren sayfa **1.842** bayta çıkıyor. Hakem ucuz, sahne pahalı — paketli dosyanın öne sürdüğü argüman da tam olarak bu.
+Diğer yönden dilimlenince: kurallar **995** bayta, onları gösteren sayfa **1.842** bayta çıkıyor. Hakem ucuz, sahne pahalı — paketli dosyanın öne sürdüğü argüman da tam olarak bu.
 
 FIDE ve lichess yapılarının ihtiyaç duyduğu üç fonksiyon burada eksik, ve hiçbiri kısaltılmadı — silindiler. Bayrak düşmesinin malzeme testi `H`, `I`'nin kendi sayaçlarının ikinci kez okunmasına çöktü. Terk veya bayrak düşmesini sonuca çeviren `F`, terk koşulsuz kayıp hâline gelince karar verecek bir şey bulamadı. Beraberlik teklifi `D`, yalnızca teklif-ve-kabul yarısını korudu; iddia yarısı iddialarla birlikte gitti.
 
@@ -445,6 +448,7 @@ FIDE ve lichess yapılarının ihtiyaç duyduğu üç fonksiyon burada eksik, ve
 - **Malzeme testi**, tahta katmanında yirmi üç durum; iki eşiği de ve onları ayıran her kombinasyonu kapsıyor, hiçbir gerçek oyunun üretmediği olanlar dahil.
 - **İki yapıda da senaryolu oyunlar**, Node'da sahte bir `prompt()` karşısında: mat, otomatik üçlü tekrar, terk, hamleyle taşınıp kabul edilen bir teklif, ve bir en passant alışı. Bunlar önceki yapıda koşuldu; o zamandan beri değişen tek şey en passant karesinin ne zaman yazıldığı, ve onu yukarıdaki iki kontrol kapsıyor.
 - **0–63'e geçiş.** Kare numaraları 1–64'ten 0–63'e geçerken `numerical_packed.html` aşağıdaki ayarlarla yeniden paketlendi ve önceki dosyayla kilit adımlı koşturuldu — eskisine 1–64, yenisine aynı kareler 0–63 olarak verildi — 100 oyunda 11.544 yarım hamle boyunca her hamleden sonra tam durum karşılaştırıldı: fark yok. Geçersiz girdi senaryoları da geçiyor: `-1`, aynı kareye gidiş, tahta dışı kareler, son yatayın ötesine sürülen piyon.
+- **Eylül 2026 kural optimizasyonları.** İki sürüm de [FideLite](https://github.com/cuneytinann/FideLite)'ta yapılan kural tarafı optimizasyonlarını aldı: piyonun çift adımı da rok da `S()` ile yürüyor, rok kalesinin karesi şahın hedefinden hesaplanıyor, başlangıç yatayı testi kısaldı, `I` kare rengini daha ucuza okuyor, paketli sürüm de en passant karesini `-1` yerine `Y` ile kapatıyor. Hiçbiri tek bir hükmü değiştirmiyor; pseudo-legal en passant karesine dokunulmadı. `index.html` önceki sürümüyle rastgele oyunlarda yan yana koşturuldu — her yarım hamleden sonra yasal hamle listeleri, en passant karesi ve `I`, ayrıca bir rok zorlama testi — fark çıkmadı; CPW perft 3. derinliğe kadar geçiyor. `numerical_packed.html` aynı değişiklikler kendi kaynağına taşınarak yeniden paketlendi ve önceki dosyayla 120 oyunda 32.621 adım boyunca kilit adımlı koşturuldu, her adımdan sonra tam durum karşılaştırıldı: fark yok. Yol boyunca iki tarafın matı, pat, otomatik elli hamle beraberliği, yetersiz materyal, terk, bayrak düşmesi ve `TM` bitişlerinin hepsi görüldü. İşaretleme değişmedi.
 
 Hamle üreteci el değmemiş durumda. `M`'nin içindeki tek değişiklik en passant karesinin ne zaman yazıldığı, ve bu bir hamle ekleyip çıkaramaz: alış komşu bir piyon istiyor, artık kontrol edilen koşul tam olarak bu, ve açmazdaki bir piyon yine `L` tarafından eleniyor. Legal hamle listeleri yukarıdaki 115.317 rastgele hamlede tek tek karşılaştırıldı. FIDE yapısının perft rakamları bu yüzden geçerli; `numerical_packed.html` üzerinde beş standart pozisyonda 3. derinliğe kadar yeniden koşuldular ve hepsi geçti. İşaretleme doğrulaması ile hücre hücre görüntüleme kontrolü yeniden koşulmadı.
 
@@ -456,40 +460,42 @@ Hamle üreteci el değmemiş durumda. `M`'nin içindeki tek değişiklik en pass
 eval(_)   →   console.log(_)
 ```
 
-Döngüde oyuna dokunan hiçbir şey yok, o yüzden bunu Node'da yapmak güvenli. Dökülen şey 1.334 baytlık kaynak.
+Döngüde oyuna dokunan hiçbir şey yok, o yüzden bunu Node'da yapmak güvenli. Dökülen şey 1.320 baytlık kaynak.
 
 **Dosyayı tarayıcıdan kopyalamak yerine indir.** Sözlük anahtarları `\x01`–`\x1f` aralığından kontrol karakterleri, ve pano — ya da satır sonlarını düzelten herhangi bir editör — onları sessizce yok eder.
 
 ## Paketleme
 
-[RegPack 5.0.1](https://github.com/Siorki/RegPack). Şu ayarlar `numerical_packed.html`'i o kaynaktan **bayt bayt** yeniden kuruyor:
+[RegPack 5.0.4](https://github.com/Siorki/RegPack); 5.0.1 birebir aynı dosyayı üretiyor. Şu ayarlar `numerical_packed.html`'i o kaynaktan **bayt bayt** yeniden kuruyor:
 
 | seçenek | değer |
 | --- | --- |
 | `reassignVars` | `false` |
-| `crushGainFactor` | `1` |
+| `crushGainFactor` | `0` |
 | `crushLengthFactor` | `0` |
-| `crushCopiesFactor` | `0.5` |
+| `crushCopiesFactor` | `0` |
 | `crushTiebreakerFactor` | `0` |
 | `useES6` | `true` |
 
-2. aşama kazanıyor, düzenli ifade karakter sınıfı: `[\x01-\x1f@-Bj_ZXV]`, 39 token. Baytlar şöyle iniyor:
+2. aşama kazanıyor, düzenli ifade karakter sınıfı: `[\x01-\x1f@-Bj_Z]`, 37 token, 35 ikame turu. Baytlar şöyle iniyor:
 
 ```
    8 B  <script>
-1158 B  paketli yük
+1144 B  paketli yük
    9 B  </script>
 ----
-1175 B
+1161 B
 ```
 
-`reassignVars`'ı açmak beş bayt kazandırıyor ve dosyayı 1.170'e indiriyor. Kapalı kalıyor, lichess yapısında kapalı kaldığı sebeple aynı: yeniden adlandırıcı `P`'den `W`'ye kadarını sözlük token'ı olarak harcıyor, yani geri çıkan kaynağın değişkenleri karıştırılmış oluyor ve artık kimsenin yazdığı program gibi okunmuyor. Beş bayt bunu geri satın almıyor.
+`reassignVars`'ı açmak üç bayt kazandırıyor ve dosyayı 1.158'e indiriyor. Kapalı kalıyor, lichess yapısında kapalı kaldığı sebeple aynı: yeniden adlandırıcı `P`'den `U`'ya kadarını sözlük token'ı olarak harcıyor, yani geri çıkan kaynağın değişkenleri karıştırılmış oluyor ve artık kimsenin yazdığı program gibi okunmuyor. Üç bayt bunu geri satın almıyor.
 
 Sıralama iki kez değişti. En passant değişikliğiyle RegPack'in README'sinin önerdiği `1/0/0`, önceden kazanan yarım değerli faktörlerin önüne geçip 1.158'le başa oturdu. 0–63'e geçiş onu yine yerinden etti: `1/0/0` artık bir bayt geride, 1.159'da; küçük bir kopya ağırlığı, `1/0/0.5`, yükü 1.158'e, geçişten önceki boyuta geri getiriyor. Yarım değerli faktörler ve RegPack'in kendi varsayılanları 1.160'ta. Bu sefer 216 crusher kombinasyonu denendi, hiçbiri daha aşağı inmiyor. Token kümesi aralarında neredeyse hiç kıpırdamıyor; fark, son birkaç ikame turunu birbirine çok yakın iki adaydan hangisinin kazandığı.
 
+Eylül 2026 kural optimizasyonları sıralamayı üçüncü kez değiştirdi. Onlar taşındıktan sonra dört faktörün de sıfır olduğu ayar 1.144'le kazanıyor; 350 kombinasyon denendi — gain 0–3, length 0–2, copies 0–2 yarımlık adımlarla, tiebreaker 0 ya da 1 — ve en kötüsü 1.181'e iniyor. Tek tek paketlendiğinde piyon yürüyüşü 6 bayt kazandırıyor, rok 4, en passant karesini `Y` ile kapatmak bir; kare rengi tek başına bir bayt kaybettiriyor, öbürleriyle birlikte bir bayt kazandırıyor. Hepsi birlikte yükü 1.158'den 1.144'e indiriyor. Dışarıda bırakılan tek değişiklik `G`'de `T|b[f]`'yi paylaşmak: düz hâlde bir bayt kazandırıyor, paketlenince üç bayt kaybettiriyor.
+
 ### Paketli dosya en kısa kaynaktan kurulmadı
 
-Yukarıdaki kaynak 1.334 bayt, ve o kaynak sıfırdan yazılmış değil, kuralları değiştirilmiş lichess kaynağı. Aynı takaslar geçerli: takma adlar ve paylaşılan fonksiyonlar düz hâlde kazanıyor, paketleyicinin altında kaybediyor, çünkü RegPack'in parası tekrar eden dizilerle ödeniyor ve bir takma ad tam olarak tekrarı ortadan kaldıran şey. Hüküm ifadesi bilerek iki kez yazılıyor, isim verilmek yerine, çünkü crusher ikinci kopyayı tek bir token'a çeviriyor ve bunun için bir fonksiyonun tutacağından daha az ücret alıyor.
+Yukarıdaki kaynak 1.320 bayt, ve o kaynak sıfırdan yazılmış değil, kuralları değiştirilmiş lichess kaynağı. Aynı takaslar geçerli: takma adlar ve paylaşılan fonksiyonlar düz hâlde kazanıyor, paketleyicinin altında kaybediyor, çünkü RegPack'in parası tekrar eden dizilerle ödeniyor ve bir takma ad tam olarak tekrarı ortadan kaldıran şey. Hüküm ifadesi bilerek iki kez yazılıyor, isim verilmek yerine, çünkü crusher ikinci kopyayı tek bir token'a çeviriyor ve bunun için bir fonksiyonun tutacağından daha az ücret alıyor.
 
 Yine de o kopyalardan biri iddialarla birlikte gitti — beraberlik kanalı eskiden hükmü yeniden değerlendiriyordu, artık değerlendirmiyor. Bu bir paketleme kararı değil kural değişikliği, ve düz kaynağın 181 bayt düşerken paketli dosyanın yalnızca 84 bayt düşmesinin sebebi bu. En passant değişikliği ters yönde işledi, aynı asimetriyle: düz kaynağa 41 bayt, pakete 31 bayt.
 
